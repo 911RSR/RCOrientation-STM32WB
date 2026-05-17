@@ -1,4 +1,4 @@
-# RC_orientation_STM32WB
+# RCOrientation-STM32WB
 
 STM32WB55 firmware for an Android-controlled roll / pitch / yaw servo receiver.
 
@@ -79,4 +79,5 @@ BLE service and application hooks live in:
 
 The project is intended to remain CubeMX-friendly: generated files should contain only small glue sections, while larger application logic should live in separate source files.
 
-The companion Android app project is `RC_orientation_app`.
+The companion Android app project is `RCOrientation-Android`.
+

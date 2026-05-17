@@ -13,7 +13,7 @@
 ######################################
 # target
 ######################################
-TARGET = RC_orientation_STM32WB
+TARGET = RCOrientation-STM32WB
 
 
 ######################################
@@ -292,3 +292,4 @@ clean:
 -include $(wildcard $(BUILD_DIR)/*.d)
 
 # *** EOF ***
+

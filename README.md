@@ -2,16 +2,27 @@
 
 STM32WB55 firmware for an Android-controlled roll / pitch / yaw servo receiver.
 
-This project was derived from a known-good STM32WB BLE project for the WeActStudio STM32WB55 CoreBoard, then simplified into a dedicated orientation receiver.
+This project runs on a WeActStudio STM32WB55 CoreBoard and pairs with the companion Android app, [RCOrientation-Android](https://github.com/911RSR/RCOrientation-Android). The Android phone sends orientation commands over BLE; the STM32WB drives RC servos and reports actuator positions back.
 
-The firmware currently:
+## Current status
+
+Working bench prototype:
 
 - advertises as `RCOrient`
-- exposes a custom BLE orientation service
-- requires bonded encrypted BLE access for the control characteristics
-- receives roll, pitch, and yaw commands from the Android app
-- drives a first RC servo test channel on `PA0 / TIM2_CH1`
-- reports servo positions back to the Android app
+- requires BLE pairing, bonding, and encrypted access to the control characteristics
+- receives roll / pitch / yaw commands from the Android app
+- configures four servo PWM outputs on `PA0..PA3 / TIM2_CH1..CH4`
+- reports servo positions back to the app
+
+Current dummy bench mixer:
+
+- roll drives `servo_us[0]`
+- pitch drives `servo_us[1]`
+- yaw drives `servo_us[2]`
+- `servo_us[3]` stays neutral
+- approximately `-45 deg .. +45 deg` maps to `1000 us .. 2000 us`
+
+This direct-forwarding mixer exists only for bench testing; a later mixer will map roll / pitch / yaw / gyro demands into the real actuator geometry.
 
 ## Hardware
 
@@ -19,22 +30,27 @@ Tested with:
 
 - WeActStudio STM32WB55 CoreBoard
 - STM32WB55CGU6
-- BLE wireless stack already flashed on CPU2
+- ST BLE wireless stack already flashed on CPU2
 
-Current one-servo bench test:
+Current bench wiring:
 
-- servo signal: `PA0`
-- timer output: `TIM2_CH1`
-- servo PWM: 50 Hz, 1 us timer resolution
+| Function | STM32 pin | Peripheral |
+| --- | --- | --- |
+| Servo 0 PWM | `PA0` | `TIM2_CH1` |
+| Servo 1 PWM | `PA1` | `TIM2_CH2` |
+| Servo 2 PWM | `PA2` | `TIM2_CH3` |
+| Servo 3 PWM | `PA3` | `TIM2_CH4` |
+
+Servo PWM is currently configured for 300 Hz with 1 us resolution during latency testing.
 
 ## BLE protocol
 
 Service UUID: `7B5D0000-6A2E-4D6B-9E6F-8D2B7C5A1100`
 
-Characteristics:
-
-- `0x0001` Orientation command, phone -> STM32WB, encrypted write / write without response, 8 bytes
-- `0x0002` Servo feedback, STM32WB -> phone, encrypted read / notify, 8 bytes
+| Characteristic | Direction | Properties | Size |
+| --- | --- | --- | --- |
+| `0x0001` Orientation command | phone -> STM32WB | encrypted write / write without response | 8 bytes |
+| `0x0002` Servo feedback | STM32WB -> phone | encrypted read / notify | 10 bytes |
 
 Orientation command payload:
 
@@ -48,36 +64,48 @@ uint16_t sequence;
 Servo feedback payload:
 
 ```c
-int16_t servo_roll_us;
-int16_t servo_pitch_us;
-int16_t servo_yaw_us;
+int16_t servo_us[4];
 uint16_t sequence;
 ```
 
-## Current servo mapping
+## Build and flash
 
-For the first bench test only:
+1. Open `RCOrientation-STM32WB.ioc` in STM32CubeMX or import the project into STM32CubeIDE.
+2. Build the project in STM32CubeIDE.
+3. Flash it to the WeAct STM32WB55 board using your normal ST-LINK / STM32CubeIDE workflow.
+4. Pair from the Android app before expecting control traffic to flow.
 
-- roll controls the physical servo on `PA0`
-- approximately `-45 deg .. +45 deg` maps to `1000 us .. 2000 us`
-- pitch and yaw feedback currently report neutral `1500 us`
+## CubeMX regeneration notes
 
-The intended next step is to add the real three-axis servo mapping and choose final output pins in CubeMX.
+The `.ioc` file is intended to be the source of truth for generated hardware setup. It currently describes:
 
-## Project structure
+- `PA0..PA3 / TIM2_CH1..CH4` as PWM outputs for `servo_us[0..3]`
+- the `RCOrient` BLE identity
+- the orientation-service naming and packet sizes
+- bonding enabled with no-input/no-output capability
 
-The application-specific protocol is defined in:
+Application logic should stay outside generated files where practical. Project-specific code currently lives in:
 
 - `Core/Inc/orientation_protocol.h`
+- `Core/Inc/orientation_app.h` and `Core/Src/orientation_app.c`
+- `Core/Inc/mixer.h` and `Core/Src/mixer.c`
+- `Core/Inc/servo_output.h` and `Core/Src/servo_output.c`
 
-BLE service and application hooks live in:
+BLE service and generated application hooks currently live in:
 
 - `STM32_WPAN/App/custom_stm.*`
 - `STM32_WPAN/App/custom_app.*`
 
-## Development notes
+Current CubeMX versions used during development regenerate duplicate BLE stubs for the read+notify feedback characteristic. Until ST fixes that generator bug, run this after code generation:
 
-The project is intended to remain CubeMX-friendly: generated files should contain only small glue sections, while larger application logic should live in separate source files.
+```powershell
+.\tools\fix-cubemx-ble-duplicates.ps1
+```
 
-The companion Android app project is `RCOrientation-Android`.
+## Security note
 
+The present configuration requires a bonded encrypted BLE link. It uses a simple no-input/no-output pairing mode, so it does not provide man-in-the-middle protection during the very first pairing ceremony.
+
+## Related project
+
+- Android app: [RCOrientation-Android](https://github.com/911RSR/RCOrientation-Android)

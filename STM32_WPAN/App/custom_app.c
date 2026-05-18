@@ -1,116 +1,248 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file    App/custom_app.c
+  * @author  MCD Application Team
+  * @brief   Custom Example Application (Server)
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2026 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "app_common.h"
 #include "dbg_trace.h"
 #include "ble.h"
 #include "custom_app.h"
 #include "custom_stm.h"
-#include "orientation_protocol.h"
-#include "tim.h"
-#include <string.h>
+#include "stm32_seq.h"
 
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+#include "orientation_app.h"
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
 typedef struct
 {
-  uint8_t Servo_Feedback_Notification_Status;
-  uint16_t ConnectionHandle;
+  /* Orientation */
+  uint8_t               Servo_feedback_Notification_Status;
+  /* USER CODE BEGIN CUSTOM_APP_Context_t */
+
+  /* USER CODE END CUSTOM_APP_Context_t */
+
+  uint16_t              ConnectionHandle;
 } Custom_App_Context_t;
 
-static Custom_App_Context_t Custom_App_Context;
-static Orientation_Command_t LatestOrientationCommand;
-static Servo_Feedback_t LatestServoFeedback = {1500, 1500, 1500, 0};
+/* USER CODE BEGIN PTD */
 
-static int16_t clamp_i16(int32_t value, int16_t min_value, int16_t max_value)
-{
-  if (value < min_value) return min_value;
-  if (value > max_value) return max_value;
-  return (int16_t)value;
-}
+/* USER CODE END PTD */
 
-static int16_t roll_cdeg_to_servo_us(int16_t roll_cdeg)
-{
-  /* Temporary first-test mapping: +/-45 deg -> 1000..2000 us */
-  int32_t pulse_us = 1500 + (((int32_t)roll_cdeg * 1000) / 9000);
-  return clamp_i16(pulse_us, 1000, 2000);
-}
+/* Private defines ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
 
+/* USER CODE END PD */
+
+/* Private macros -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+/**
+ * START of Section BLE_APP_CONTEXT
+ */
+
+static Custom_App_Context_t Custom_App_Context __attribute__((unused));
+
+/**
+ * END of Section BLE_APP_CONTEXT
+ */
+
+uint8_t UpdateCharData[512];
+uint8_t NotifyCharData[512];
+uint16_t Connection_Handle;
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+/* Orientation */
+static void Custom_Servo_feedback_Update_Char(void);
+static void Custom_Servo_feedback_Send_Notification(void);
+
+
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Functions Definition ------------------------------------------------------*/
 void Custom_STM_App_Notification(Custom_STM_App_Notification_evt_t *pNotification)
 {
+  /* USER CODE BEGIN CUSTOM_STM_App_Notification_1 */
+
+  /* USER CODE END CUSTOM_STM_App_Notification_1 */
   switch (pNotification->Custom_Evt_Opcode)
   {
+    /* USER CODE BEGIN CUSTOM_STM_App_Notification_Custom_Evt_Opcode */
+
+    /* USER CODE END CUSTOM_STM_App_Notification_Custom_Evt_Opcode */
+
+    /* Orientation */
+    case CUSTOM_STM_ORIENTATION_COMMAND_WRITE_NO_RESP_EVT:
+      /* USER CODE BEGIN CUSTOM_STM_ORIENTATION_COMMAND_WRITE_NO_RESP_EVT */
+      OrientationApp_HandleCommand(pNotification->DataTransfered.pPayload, pNotification->DataTransfered.Length);
+      /* USER CODE END CUSTOM_STM_ORIENTATION_COMMAND_WRITE_NO_RESP_EVT */
+      break;
+
     case CUSTOM_STM_ORIENTATION_COMMAND_WRITE_EVT:
-      if (pNotification->DataTransfered.Length == sizeof(Orientation_Command_t))
-      {
-        memcpy(&LatestOrientationCommand,
-               pNotification->DataTransfered.pPayload,
-               sizeof(Orientation_Command_t));
+      /* USER CODE BEGIN CUSTOM_STM_ORIENTATION_COMMAND_WRITE_EVT */
+      OrientationApp_HandleCommand(pNotification->DataTransfered.pPayload, pNotification->DataTransfered.Length);
+      /* USER CODE END CUSTOM_STM_ORIENTATION_COMMAND_WRITE_EVT */
+      break;
 
-        LatestServoFeedback.servo_roll_us = roll_cdeg_to_servo_us(LatestOrientationCommand.roll_cdeg);
-        LatestServoFeedback.servo_pitch_us = 1500;
-        LatestServoFeedback.servo_yaw_us = 1500;
-        LatestServoFeedback.sequence = LatestOrientationCommand.sequence;
+    case CUSTOM_STM_SERVO_FEEDBACK_READ_EVT:
+      /* USER CODE BEGIN CUSTOM_STM_SERVO_FEEDBACK_READ_EVT */
 
-        __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, (uint16_t)LatestServoFeedback.servo_roll_us);
-        Orientation_PublishServoFeedback();
-      }
+      /* USER CODE END CUSTOM_STM_SERVO_FEEDBACK_READ_EVT */
       break;
 
     case CUSTOM_STM_SERVO_FEEDBACK_NOTIFY_ENABLED_EVT:
-      Custom_App_Context.Servo_Feedback_Notification_Status = 1;
-      Orientation_PublishServoFeedback();
+      /* USER CODE BEGIN CUSTOM_STM_SERVO_FEEDBACK_NOTIFY_ENABLED_EVT */
+      OrientationApp_SetServoFeedbackNotificationsEnabled(1);
+      /* USER CODE END CUSTOM_STM_SERVO_FEEDBACK_NOTIFY_ENABLED_EVT */
       break;
 
     case CUSTOM_STM_SERVO_FEEDBACK_NOTIFY_DISABLED_EVT:
-      Custom_App_Context.Servo_Feedback_Notification_Status = 0;
+      /* USER CODE BEGIN CUSTOM_STM_SERVO_FEEDBACK_NOTIFY_DISABLED_EVT */
+      OrientationApp_SetServoFeedbackNotificationsEnabled(0);
+      /* USER CODE END CUSTOM_STM_SERVO_FEEDBACK_NOTIFY_DISABLED_EVT */
+      break;
+
+    case CUSTOM_STM_NOTIFICATION_COMPLETE_EVT:
+      /* USER CODE BEGIN CUSTOM_STM_NOTIFICATION_COMPLETE_EVT */
+
+      /* USER CODE END CUSTOM_STM_NOTIFICATION_COMPLETE_EVT */
       break;
 
     default:
+      /* USER CODE BEGIN CUSTOM_STM_App_Notification_default */
+
+      /* USER CODE END CUSTOM_STM_App_Notification_default */
       break;
   }
+  /* USER CODE BEGIN CUSTOM_STM_App_Notification_2 */
+
+  /* USER CODE END CUSTOM_STM_App_Notification_2 */
+  return;
 }
 
 void Custom_APP_Notification(Custom_App_ConnHandle_Not_evt_t *pNotification)
 {
+  /* USER CODE BEGIN CUSTOM_APP_Notification_1 */
+
+  /* USER CODE END CUSTOM_APP_Notification_1 */
+
   switch (pNotification->Custom_Evt_Opcode)
   {
-    case CUSTOM_CONN_HANDLE_EVT:
-      Custom_App_Context.ConnectionHandle = pNotification->ConnectionHandle;
+    /* USER CODE BEGIN CUSTOM_APP_Notification_Custom_Evt_Opcode */
+
+    /* USER CODE END P2PS_CUSTOM_Notification_Custom_Evt_Opcode */
+    case CUSTOM_CONN_HANDLE_EVT :
+      /* USER CODE BEGIN CUSTOM_CONN_HANDLE_EVT */
+
+      /* USER CODE END CUSTOM_CONN_HANDLE_EVT */
       break;
-    case CUSTOM_DISCON_HANDLE_EVT:
-      Custom_App_Context.ConnectionHandle = 0;
-      Custom_App_Context.Servo_Feedback_Notification_Status = 0;
+
+    case CUSTOM_DISCON_HANDLE_EVT :
+      /* USER CODE BEGIN CUSTOM_DISCON_HANDLE_EVT */
+
+      /* USER CODE END CUSTOM_DISCON_HANDLE_EVT */
       break;
+
     default:
+      /* USER CODE BEGIN CUSTOM_APP_Notification_default */
+
+      /* USER CODE END CUSTOM_APP_Notification_default */
       break;
   }
+
+  /* USER CODE BEGIN CUSTOM_APP_Notification_2 */
+
+  /* USER CODE END CUSTOM_APP_Notification_2 */
+
+  return;
 }
 
 void Custom_APP_Init(void)
 {
-  memset(&LatestOrientationCommand, 0, sizeof(LatestOrientationCommand));
-  if (HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1) != HAL_OK)
+  /* USER CODE BEGIN CUSTOM_APP_Init */
+  OrientationApp_Init();
+  /* USER CODE END CUSTOM_APP_Init */
+  return;
+}
+
+/* USER CODE BEGIN FD */
+
+/* USER CODE END FD */
+
+/*************************************************************
+ *
+ * LOCAL FUNCTIONS
+ *
+ *************************************************************/
+
+/* Orientation */
+__USED void Custom_Servo_feedback_Update_Char(void) /* Property Read */
+{
+  uint8_t updateflag = 0;
+
+  /* USER CODE BEGIN Servo_feedback_UC_1*/
+
+  /* USER CODE END Servo_feedback_UC_1*/
+
+  if (updateflag != 0)
   {
-    Error_Handler();
+    Custom_STM_App_Update_Char(CUSTOM_STM_SERVO_FEEDBACK, (uint8_t *)UpdateCharData);
   }
-  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, LatestServoFeedback.servo_roll_us);
+
+  /* USER CODE BEGIN Servo_feedback_UC_Last*/
+
+  /* USER CODE END Servo_feedback_UC_Last*/
+  return;
 }
 
-void Orientation_SetServoFeedback(int16_t roll_us, int16_t pitch_us, int16_t yaw_us)
+__attribute__((unused)) void Custom_Servo_feedback_Send_Notification(void) /* Property Notification */
 {
-  LatestServoFeedback.servo_roll_us = roll_us;
-  LatestServoFeedback.servo_pitch_us = pitch_us;
-  LatestServoFeedback.servo_yaw_us = yaw_us;
-  __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, (uint16_t)roll_us);
-}
+  uint8_t updateflag = 0;
 
-void Orientation_PublishServoFeedback(void)
-{
-  if (Custom_App_Context.Servo_Feedback_Notification_Status != 0)
+  /* USER CODE BEGIN Servo_feedback_NS_1*/
+
+  /* USER CODE END Servo_feedback_NS_1*/
+
+  if (updateflag != 0)
   {
-    Custom_STM_App_Update_Char(CUSTOM_STM_SERVO_FEEDBACK,
-                               (uint8_t *)&LatestServoFeedback);
+    Custom_STM_App_Update_Char(CUSTOM_STM_SERVO_FEEDBACK, (uint8_t *)NotifyCharData);
   }
+
+  /* USER CODE BEGIN Servo_feedback_NS_Last*/
+
+  /* USER CODE END Servo_feedback_NS_Last*/
+
+  return;
 }
 
-const Orientation_Command_t *Orientation_GetLatestCommand(void)
-{
-  return &LatestOrientationCommand;
-}
+
+/* USER CODE BEGIN FD_LOCAL_FUNCTIONS*/
+
+/* USER CODE END FD_LOCAL_FUNCTIONS*/

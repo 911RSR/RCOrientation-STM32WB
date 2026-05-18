@@ -82,7 +82,7 @@
 #define CFG_IO_CAPABILITY_NO_INPUT_NO_OUTPUT  (0x03)
 #define CFG_IO_CAPABILITY_KEYBOARD_DISPLAY    (0x04)
 
-#define CFG_IO_CAPABILITY                 CFG_IO_CAPABILITY_NO_INPUT_NO_OUTPUT
+#define CFG_IO_CAPABILITY                      CFG_IO_CAPABILITY_NO_INPUT_NO_OUTPUT
 
 /**
  * Define MITM modes
@@ -90,7 +90,7 @@
 #define CFG_MITM_PROTECTION_NOT_REQUIRED      (0x00)
 #define CFG_MITM_PROTECTION_REQUIRED          (0x01)
 
-#define CFG_MITM_PROTECTION               CFG_MITM_PROTECTION_NOT_REQUIRED
+#define CFG_MITM_PROTECTION                   CFG_MITM_PROTECTION_NOT_REQUIRED
 
 /**
  * Define Secure Connections Support
@@ -740,4 +740,3 @@ typedef enum
 #define CFG_OTP_END_ADRESS      OTP_AREA_END_ADDR
 
 #endif /*APP_CONF_H */
-

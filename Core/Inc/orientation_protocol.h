@@ -4,7 +4,8 @@
 #include <stdint.h>
 
 #define ORIENTATION_COMMAND_SIZE_BYTES 8u
-#define SERVO_FEEDBACK_SIZE_BYTES      8u
+#define SERVO_COUNT                    4u
+#define SERVO_FEEDBACK_SIZE_BYTES      10u
 
 typedef struct __attribute__((packed))
 {
@@ -16,9 +17,7 @@ typedef struct __attribute__((packed))
 
 typedef struct __attribute__((packed))
 {
-  int16_t servo_roll_us;
-  int16_t servo_pitch_us;
-  int16_t servo_yaw_us;
+  int16_t servo_us[SERVO_COUNT];
   uint16_t sequence;
 } Servo_Feedback_t;
 

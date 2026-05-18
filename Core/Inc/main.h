@@ -79,36 +79,16 @@ void Error_Handler(void);
 #define MPU_SCL_GPIO_Port GPIOB
 #define MPU_SDA_Pin GPIO_PIN_9
 #define MPU_SDA_GPIO_Port GPIOB
-#define RPM_timer_Pin GPIO_PIN_0
-#define RPM_timer_GPIO_Port GPIOA
-#define MAP_Pin GPIO_PIN_1
-#define MAP_GPIO_Port GPIOA
-#define NTC_Pin GPIO_PIN_2
-#define NTC_GPIO_Port GPIOA
-#define MAP_VCC_Pin GPIO_PIN_3
-#define MAP_VCC_GPIO_Port GPIOA
-#define TC_VCC_Pin GPIO_PIN_4
-#define TC_VCC_GPIO_Port GPIOA
-#define LS_PWM_Pin GPIO_PIN_6
-#define LS_PWM_GPIO_Port GPIOA
-#define LS_UBat_sense_Pin GPIO_PIN_7
-#define LS_UBat_sense_GPIO_Port GPIOA
-#define CJ125_UA_Pin GPIO_PIN_8
-#define CJ125_UA_GPIO_Port GPIOA
-#define CJ125_UR_Pin GPIO_PIN_9
-#define CJ125_UR_GPIO_Port GPIOA
-#define CJ125_RST_Pin GPIO_PIN_2
-#define CJ125_RST_GPIO_Port GPIOB
-#define LS_LED1_Pin GPIO_PIN_0
-#define LS_LED1_GPIO_Port GPIOB
-#define LS_LED2_Pin GPIO_PIN_1
-#define LS_LED2_GPIO_Port GPIOB
+#define SERVO_PWM0_Pin GPIO_PIN_0
+#define SERVO_PWM0_GPIO_Port GPIOA
+#define SERVO_PWM1_Pin GPIO_PIN_1
+#define SERVO_PWM1_GPIO_Port GPIOA
+#define SERVO_PWM2_Pin GPIO_PIN_2
+#define SERVO_PWM2_GPIO_Port GPIOA
+#define SERVO_PWM3_Pin GPIO_PIN_3
+#define SERVO_PWM3_GPIO_Port GPIOA
 #define LED_Pin GPIO_PIN_4
 #define LED_GPIO_Port GPIOE
-#define TC_NSS_Pin GPIO_PIN_10
-#define TC_NSS_GPIO_Port GPIOA
-#define CJ125_NSS_Pin GPIO_PIN_15
-#define CJ125_NSS_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 

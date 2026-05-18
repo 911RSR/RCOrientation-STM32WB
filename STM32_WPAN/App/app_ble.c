@@ -254,7 +254,9 @@ void APP_BLE_Init(void)
 #if (RADIO_ACTIVITY_EVENT != 0)
   tBleStatus ret = BLE_STATUS_INVALID_PARAMS;
 #endif /* RADIO_ACTIVITY_EVENT != 0 */
-  /* USER CODE BEGIN APP_BLE_Init_1 */  /* USER CODE END APP_BLE_Init_1 */
+  /* USER CODE BEGIN APP_BLE_Init_1 */
+
+  /* USER CODE END APP_BLE_Init_1 */
   SHCI_C2_Ble_Init_Cmd_Packet_t ble_init_cmd_packet =
   {
     {{0,0,0}},                          /**< Header unused */
@@ -1258,4 +1260,3 @@ void SVCCTL_ResumeUserEventFlow(void)
 /* USER CODE BEGIN FD_WRAP_FUNCTIONS */
 
 /* USER CODE END FD_WRAP_FUNCTIONS */
-

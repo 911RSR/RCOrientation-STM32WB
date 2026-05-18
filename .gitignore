@@ -6,6 +6,10 @@
 # keep project-defining files under version control for reproducible builds
 # (.project, .cproject, .settings/, linker scripts, startup code, USB_Device sources)
 
+# local linker-script experiments kept out of the reproducible project set
+*.generated-bad.ld
+*.working.ld
+
 # For PCBs designed using KiCad: https://www.kicad.org/
 # Format documentation: https://kicad.org/help/file-formats/
 

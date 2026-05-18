@@ -14,7 +14,7 @@ Working bench prototype:
 - configures four servo PWM outputs on `PA0..PA3 / TIM2_CH1..CH4`
 - reports servo positions back to the app
 
-Current dummy bench mixer:
+Servo mixer with direct forwarding:
 
 - roll drives `servo_us[0]`
 - pitch drives `servo_us[1]`
@@ -22,7 +22,8 @@ Current dummy bench mixer:
 - `servo_us[3]` stays neutral
 - approximately `-45 deg .. +45 deg` maps to `1000 us .. 2000 us`
 
-This direct-forwarding mixer exists only for bench testing; a later mixer will map roll / pitch / yaw / gyro demands into the real actuator geometry.
+This mixer is mainly for bench testing, although it could teoretically be used for short-range RC plane control; 
+A later mixer will map roll / pitch / yaw / gyro demands into the real actuator geometry.
 
 ## Hardware
 

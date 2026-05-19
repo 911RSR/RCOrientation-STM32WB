@@ -71,10 +71,13 @@ uint16_t sequence;
 
 ## Build and flash
 
-1. Open `RCOrientation-STM32WB.ioc` in STM32CubeMX or import the project into STM32CubeIDE.
-2. Build the project in STM32CubeIDE.
-3. Flash it to the WeAct STM32WB55 board using your normal ST-LINK / STM32CubeIDE workflow.
-4. Pair from the Android app before expecting control traffic to flow.
+1. Open `RCOrientation-STM32WB.ioc` in STM32CubeMX or STM32CubeIDE.
+2. Let STM32CubeIDE/CubeMX generate the local Eclipse project metadata on your own PC.
+3. Build the project in STM32CubeIDE.
+4. Flash it to the WeAct STM32WB55 board using your normal ST-LINK / STM32CubeIDE workflow.
+5. Pair from the Android app before expecting control traffic to flow.
+
+The `.project`, `.cproject`, `.mxproject`, `.settings/`, and `*.launch` files are intentionally not tracked because STM32CubeIDE fills them with machine-local paths.
 
 ## CubeMX regeneration notes
 

@@ -3,8 +3,12 @@
 /Release/
 /build/
 
-# keep project-defining files under version control for reproducible builds
-# (.project, .cproject, .settings/, linker scripts, startup code, USB_Device sources)
+# STM32CubeIDE/Eclipse local workspace metadata. Regenerate/import locally from the .ioc file.
+.project
+.cproject
+.mxproject
+.settings/
+*.launch
 
 # local linker-script experiments kept out of the reproducible project set
 *.generated-bad.ld

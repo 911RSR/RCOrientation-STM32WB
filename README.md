@@ -44,6 +44,8 @@ Current bench wiring:
 
 Servo PWM is currently configured for 300 Hz with 1 us resolution during latency testing.
 
+The STM32WB board and servos may share the same battery source if the board regulator input range allows it and the servo voltage is appropriate. The supply must tolerate servo current spikes without excessive voltage droop or ground bounce. Standard servos generally need a regulated 5–6 V rail; HV servos may allow 2S LiPo directly. Always verify voltage limits for both the STM32 board input regulator and the servos.
+
 ## BLE protocol
 
 Service UUID: `7B5D0000-6A2E-4D6B-9E6F-8D2B7C5A1100`

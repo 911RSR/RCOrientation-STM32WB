@@ -39,7 +39,7 @@ void OrientationApp_HandleCommand(const uint8_t *payload, uint8_t length)
   }
 
   memcpy(&LatestOrientationCommand, payload, sizeof(Orientation_Command_t));
-  int16_t requested_servo_us[SERVO_COUNT] = {0};
+  uint16_t requested_servo_us[SERVO_COUNT] = {0};
 
   LatestServoFeedback.sequence = LatestOrientationCommand.sequence;
   Mixer_ComputeServoUs(&LatestOrientationCommand, requested_servo_us);

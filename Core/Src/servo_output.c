@@ -3,7 +3,7 @@
 #include "main.h"
 #include "tim.h"
 
-static int16_t ServoUs[SERVO_COUNT] = {
+static uint16_t ServoUs[SERVO_COUNT] = {
     SERVO_NEUTRAL_US,
     SERVO_NEUTRAL_US,
     SERVO_NEUTRAL_US,
@@ -37,7 +37,7 @@ void ServoOutput_Init(void)
   }
 }
 
-void ServoOutput_SetUs(uint8_t servo_index, int16_t pulse_us)
+void ServoOutput_SetUs(uint8_t servo_index, uint16_t pulse_us)
 {
   if (servo_index >= SERVO_COUNT)
   {
@@ -49,11 +49,11 @@ void ServoOutput_SetUs(uint8_t servo_index, int16_t pulse_us)
   /* Servo 3 / PA3 is reserved in the model but not physically populated yet. */
   if (servo_index < 3U)
   {
-    __HAL_TIM_SET_COMPARE(&htim2, ServoTimerChannels[servo_index], (uint16_t)ServoUs[servo_index]);
+    __HAL_TIM_SET_COMPARE(&htim2, ServoTimerChannels[servo_index], ServoUs[servo_index]);
   }
 }
 
-void ServoOutput_SetAllUs(const int16_t pulse_us[SERVO_COUNT])
+void ServoOutput_SetAllUs(const uint16_t pulse_us[SERVO_COUNT])
 {
   if (pulse_us == 0)
   {
@@ -66,7 +66,7 @@ void ServoOutput_SetAllUs(const int16_t pulse_us[SERVO_COUNT])
   }
 }
 
-const int16_t *ServoOutput_GetAllUs(void)
+const uint16_t *ServoOutput_GetAllUs(void)
 {
   return ServoUs;
 }
